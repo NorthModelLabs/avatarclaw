@@ -4,7 +4,7 @@
 |--------------|----------------|
 | `atlas-bridge-slack` | **Working:** post session summary via **Slack Incoming Webhook** (`SLACK_WEBHOOK_URL`). |
 | `atlas-bridge-discord` | **Working:** post session summary + optional **embed** (`viewer_url`) + optional **MP4 attach** via **Discord webhook** (`DISCORD_WEBHOOK_URL`). |
-| `atlas-bridge-google-meet` | **Guide only:** JSON + docs — Atlas does not join Meet from this repo. |
+| `atlas-bridge-google-meet` | **Guide + `meet_assist.py`:** checklist, open Meet in browser, draft chat paste — **no** hosted Meet bot; you join as human + share viewer. |
 | `atlas-bridge-zoom` | **Guide only:** JSON + docs — Atlas does not join Zoom from this repo. |
 
 Copy any folder into your OpenClaw `skills/` directory alongside `atlas-avatar`:

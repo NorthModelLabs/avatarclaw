@@ -19,6 +19,10 @@ GUIDE = {
         "Evaluate Google Meet add-ons / Workspace APIs for your org (admin + compliance).",
         "Partner with a meeting-bot / media-bridge vendor if you need synthetic participants.",
     ],
+    "meet_assist_script": (
+        "skills/atlas-bridge-google-meet/scripts/meet_assist.py — "
+        "subcommands: checklist, open-meet, paste-message (human-in-loop + viewer link)."
+    ),
     "references": [
         "https://developers.google.com/workspace/meet",
         "https://github.com/NorthModelLabs/atlas-realtime-example",

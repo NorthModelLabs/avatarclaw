@@ -195,4 +195,4 @@ Point your chat client at OpenClaw’s OpenAI-compatible base URL; use this skil
 
 ## Related: Slack / Discord / Meet / Zoom
 
-This monorepo includes **bridge** skills under `skills/` — see **`CONNECTORS.md`**. Slack and Discord can **post** session info via webhooks; Discord can add a **`viewer_url`** embed (link to your web avatar) and optionally attach a short **MP4**. Meet and Zoom skills are **integration guides** only — no Meet/Zoom join in-repo (that is a separate meeting-bot product layer).
+This monorepo includes **bridge** skills under `skills/` — see **`CONNECTORS.md`**. Slack and Discord can **post** session info via webhooks; Discord can add a **`viewer_url`** embed and optionally attach a short **MP4**. **Google Meet:** `meet_assist.py` helps with checklist / browser open / chat paste — **not** a hosted Meet bot (see that skill’s `SKILL.md`). Zoom remains **guide-only**.

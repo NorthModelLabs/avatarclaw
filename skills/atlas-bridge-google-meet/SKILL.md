@@ -1,7 +1,7 @@
 ---
 name: atlas_bridge_google_meet
-description: "Guidance for combining Atlas avatars with Google Meet. Use when the user asks to join Meet, put avatar in Meet, or integrate Atlas with Google Meet — explains what is and is not possible from this repo alone."
-version: "0.1.0"
+description: "Combine Atlas avatars with Google Meet: honest limits, meet_assist checklist/open/paste-message, and integration_guide JSON. Does not join Meet as a hosted bot."
+version: "0.2.0"
 tags: ["atlas", "google-meet", "bridge", "openclaw", "integration"]
 author: "northmodellabs"
 metadata:
@@ -10,23 +10,38 @@ metadata:
       bins: [python3]
 ---
 
-# Atlas + Google Meet (integration guide)
+# Atlas + Google Meet
 
-## What this skill is **not**
+## What this skill **does not** do
 
-There is **no script here that joins Meet as a bot** or injects Atlas video into Meet.
+There is **no hosted Meet bot** in this repo (no synthetic participant that joins `meet.google.com` on your behalf via Atlas HTTP). Products that offer that ([example pattern](https://github.com/Pika-Labs/Pika-Skills)) ship **their own** join API and cloud fleet.
 
-**Meeting-native agents (auto-join):** products that join calls for you ship a **separate meeting-bot fleet** (browser automation, Workspace partner integrations, or third-party join APIs) and pipe media into **their** rendering stack. **Atlas in this repo is that rendering API (LiveKit + GPU), not the Meet joiner.** Duplicating the join layer means Google/Workspace compliance, infra, and usually a vendor or dedicated team — not a webhook-sized skill.
+**Atlas here** = `POST /v1/realtime/session` → **LiveKit** for **your** viewer app or pipeline.
 
-## What **Atlas** gives you
+## What we ship: `meet_assist.py` (human + viewer workflow)
 
-- `POST /v1/realtime/session` → `livekit_url`, `token`, `room` for a **LiveKit** client (web or app).
+| Subcommand | Purpose |
+|------------|---------|
+| `checklist --meet-url URL` | JSON steps: join Meet yourself, start Atlas session, share viewer, leave session when done. |
+| `open-meet --meet-url URL` | Open the Meet link in the default browser (you still join as a user). |
+| `paste-message --meet-url URL -f session.json [--viewer-url HTTPS]` | Text block for Meet **chat** (session ids + link to your avatar page). |
 
-## Practical patterns
+```bash
+python3 skills/atlas-bridge-google-meet/scripts/meet_assist.py checklist --meet-url "https://meet.google.com/xxx-xxxx-xxx"
+python3 skills/atlas-bridge-google-meet/scripts/meet_assist.py open-meet --meet-url "https://meet.google.com/xxx-xxxx-xxx"
+python3 skills/atlas-bridge-google-meet/scripts/meet_assist.py paste-message \
+  --meet-url "https://meet.google.com/xxx-xxxx-xxx" \
+  -f session.json \
+  --viewer-url "https://yourapp.com/avatar/..."
+```
 
-1. **Link in chat** — Paste your **web client URL** (your app that connects to LiveKit) into Meet chat so participants open the avatar in a side tab.
-2. **Presenter workflow** — Share browser tab that shows your Atlas/LiveKit client (screen share).
-3. **Build or buy a bot** — Use a **Meet bot platform** or internal gateway that joins Meet and bridges media to your pipeline, then Atlas **passthrough** if you feed audio correctly (major engineering + policy review).
+**Flow:** `atlas_session.py start … > session.json` → add or pass **`viewer_url`** → `paste-message` → paste into Meet chat; or screen-share your viewer tab.
+
+## Practical patterns (same as before)
+
+1. **Link in chat** — Viewer opens your HTTPS page (token minted server-side).
+2. **Presenter** — Screen-share the tab running the Atlas/LiveKit client.
+3. **Build or buy a bot** — Separate project: Meet media bridge → Atlas **passthrough** (compliance + engineering).
 
 ## Machine-readable summary
 
@@ -34,4 +49,4 @@ There is **no script here that joins Meet as a bot** or injects Atlas video into
 python3 skills/atlas-bridge-google-meet/scripts/integration_guide.py
 ```
 
-Returns JSON with official doc hints and recommended next steps for engineers.
+Returns JSON with doc hints and `meeting_bot_layer_note`.
