@@ -8,6 +8,11 @@ GUIDE = {
     "platform": "zoom",
     "atlas_capability": "Creates LiveKit-backed realtime sessions via Atlas API; does not join zoom.us links.",
     "honest_status": "no_automated_zoom_join_in_this_repo",
+    "pika_style_products_note": (
+        "Meeting-native agents rely on a Zoom bot / SDK integration layer to join as a participant "
+        "and bridge media. This repo does not include that layer; Atlas supplies avatar realtime "
+        "after you bring meeting audio/video in (e.g. passthrough)."
+    ),
     "suggested_product_paths": [
         "Share your Atlas/LiveKit web client link in Zoom chat.",
         "Screen-share a browser tab with the avatar UI.",
