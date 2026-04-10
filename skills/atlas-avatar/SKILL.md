@@ -29,7 +29,7 @@ Atlas provides **realtime** sessions (LiveKit) and **async** offline jobs (`POST
 
 ---
 
-## Preferred for agents: `scripts/atlas_session.py` (Pika-style verbs)
+## Preferred for agents: `scripts/atlas_session.py` (verb CLI: start / leave / face-swap / …)
 
 One entrypoint with **`start` / `leave` / `face-swap`** style commands. This only calls the **Atlas HTTP API** — it does **not** join Google Meet or other apps. After **`start`**, use `livekit_url`, `token`, and `room` in a LiveKit client ([sample apps](https://github.com/NorthModelLabs/atlas-realtime-example), [`@northmodellabs/atlas-react`](https://www.npmjs.com/package/@northmodellabs/atlas-react)).
 

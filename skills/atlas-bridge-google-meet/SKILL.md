@@ -16,7 +16,7 @@ metadata:
 
 There is **no script here that joins Meet as a bot** or injects Atlas video into Meet.
 
-**“Like Pika” / meeting-native agents:** products that auto-join calls ship a **separate meeting-bot fleet** (browser automation, Workspace partner integrations, or third-party join APIs) and pipe media into **their** rendering stack. **Atlas in this repo is that rendering API (LiveKit + GPU), not the Meet joiner.** Duplicating the join layer means Google/Workspace compliance, infra, and usually a vendor or dedicated team — not a webhook-sized skill.
+**Meeting-native agents (auto-join):** products that join calls for you ship a **separate meeting-bot fleet** (browser automation, Workspace partner integrations, or third-party join APIs) and pipe media into **their** rendering stack. **Atlas in this repo is that rendering API (LiveKit + GPU), not the Meet joiner.** Duplicating the join layer means Google/Workspace compliance, infra, and usually a vendor or dedicated team — not a webhook-sized skill.
 
 ## What **Atlas** gives you
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright North Model Labs — MIT (see repo LICENSE)
-"""Atlas realtime + offline avatar — agent-facing CLI (Pika-Skills style).
+"""Atlas realtime + offline avatar — agent-facing verb CLI (start, leave, face-swap, jobs, …).
 
 This is **not** a meeting bot: it calls the Atlas HTTP API only. After ``start``,
 connect a LiveKit client (web / @northmodellabs/atlas-react) using ``livekit_url``,

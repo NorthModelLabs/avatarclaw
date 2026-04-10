@@ -97,7 +97,7 @@ Atlas **realtime** sessions use **LiveKit**: your client (or demo app) connects 
 | `core/atlas_cli.py` | REST CLI (`realtime create`, `jobs wait`, …) |
 | `core/requirements.txt` | `requests` |
 | `skills/atlas-avatar/SKILL.md` | Skill — Python + `curl` |
-| `skills/atlas-avatar/scripts/atlas_session.py` | Pika-style verbs for agents |
+| `skills/atlas-avatar/scripts/atlas_session.py` | Verb CLI for agents (`start`, `leave`, …) |
 | `skills/atlas-avatar/requirements.txt` | Same deps as `core/` |
 | `skills/atlas-avatar/references/api-reference.md` | Endpoint reference |
 | `skills/atlas-bridge-*` | Slack/Discord webhooks + Meet/Zoom guides |

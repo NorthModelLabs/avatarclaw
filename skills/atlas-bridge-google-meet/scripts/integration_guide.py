@@ -8,7 +8,7 @@ GUIDE = {
     "platform": "google_meet",
     "atlas_capability": "Creates LiveKit-backed realtime sessions via Atlas API; does not join Meet URLs.",
     "honest_status": "no_automated_meet_join_in_this_repo",
-    "pika_style_products_note": (
+    "meeting_bot_layer_note": (
         "Vendors that 'join Meet for you' run a meeting-bot layer (headless browser, "
         "certified Meet integration, or enterprise media APIs) and bridge audio/video to their GPU stack. "
         "That layer is not in this repo; Atlas is the avatar/realtime API behind your own bridge."
