@@ -1,6 +1,6 @@
 # Integrating Atlas Avatar with OpenClaw
 
-Part of the **[avatarclaw](https://github.com/NorthModelLabs/avatarclaw)** repository. This document is for **developers** wiring OpenClaw (or any OpenAI Chat Completions–compatible client) together with Atlas GPU avatars.
+Part of the **[avatarclaw](https://github.com/NorthModelLabs/avatarclaw)** monorepo (`core/` + `skills/`). For developers wiring OpenClaw (or any OpenAI Chat Completions–compatible client) with Atlas GPU avatars.
 
 ## 1. Roles
 
@@ -10,97 +10,50 @@ Part of the **[avatarclaw](https://github.com/NorthModelLabs/avatarclaw)** repos
 | **Atlas API** | Realtime LiveKit sessions, offline render jobs, credits, API keys |
 | **Your client** | Browser or desktop app that connects to LiveKit for video |
 
-Atlas does **not** replace OpenClaw. They compose: OpenClaw decides *when* to create a session; Atlas *runs* the avatar infrastructure.
+## 2. Install the skill
 
-## 2. Install the skill (teach the agent)
-
-Copy `skill/atlas-avatar` into an OpenClaw skills path (see [Creating skills](https://docs.openclaw.ai/tools/creating-skills)):
+Copy **`skills/atlas-avatar`** into an OpenClaw skills path ([Creating skills](https://docs.openclaw.ai/tools/creating-skills)):
 
 ```bash
 mkdir -p ~/.openclaw/workspace/skills
-cp -R /path/to/atlas-avatar-openclaw/skill/atlas-avatar ~/.openclaw/workspace/skills/
+cp -R /path/to/avatarclaw/skills/atlas-avatar ~/.openclaw/workspace/skills/
 ```
 
-Set environment variables in the shell that launches OpenClaw (or in `~/.openclaw/.env` if you use one):
+**Recommended:** keep a **full clone** of the repo so `core/atlas_cli.py` exists. If the skill lives alone, set **`ATLAS_AGENT_REPO`** to the monorepo root and call `skills/atlas-avatar/scripts/run_atlas_cli.py`.
 
 ```bash
 export ATLAS_API_KEY="ak_..."
 export ATLAS_API_BASE="https://api.atlasv1.com"
+# optional if skill copied without core/:
+# export ATLAS_AGENT_REPO="/path/to/avatarclaw"
 ```
 
-Restart OpenClaw or start a `/new` session so skills reload.
+## 3. Python CLI vs curl
 
-## 3. Optional: OpenClaw as the LLM backend
+- **`python3 core/atlas_cli.py`** — preferred from the repo root after `pip install -r core/requirements.txt`.
+- **`curl`** — still documented in `SKILL.md` for zero-dependency environments.
 
-If your OpenClaw install exposes an OpenAI-compatible API:
+## 4. Optional: OpenClaw as the LLM backend
 
-- Configure the **chat model** in OpenClaw to your provider (Anthropic, OpenAI, etc.).
-- For tools that only need Atlas, the skill’s `curl` flows are enough.
+Same as before: configure chat in OpenClaw; Atlas calls use `ATLAS_API_KEY` separately.
 
-If you run a **separate** app that uses `openai` Python SDK:
+## 5. Realtime / offline flows
 
-```python
-from openai import OpenAI
+Unchanged: create session → LiveKit client → `DELETE` when done; offline `POST /v1/generate` → poll → result.
 
-client = OpenAI(
-    base_url="https://YOUR_OPENCLAW_GATEWAY/.../openai",  # per OpenClaw docs
-    api_key="YOUR_OPENCLAW_OR_ROUTE_KEY",
-)
-```
+## 6. ClawHub
 
-Atlas remains called over HTTPS with `ATLAS_API_KEY` — different credential.
-
-## 4. Realtime UX flow
-
-1. User asks the agent to “start an avatar session.”
-2. Agent (via skill) calls `POST /v1/realtime/session`.
-3. Agent returns `livekit_url`, `token`, `room` to the user (or your UI).
-4. Your frontend uses [LiveKit client SDKs](https://docs.livekit.io/) to connect and subscribe to remote video/audio.
-5. When done, agent or UI calls `DELETE /v1/realtime/session/{session_id}`.
-
-**Conversation mode:** Atlas agent worker does STT → LLM → TTS → avatar. User speaks in the LiveKit room.
-
-**Passthrough mode:** You send audio to the avatar track (or data path) per your integration; no Atlas-hosted LLM for that path.
-
-## 5. Offline / batch flow
-
-1. `POST /v1/generate` with `audio` + `image` files.
-2. Poll `GET /v1/jobs/{job_id}` until terminal state.
-3. `GET /v1/jobs/{job_id}/result` for download URL.
-
-Good for OpenClaw batch jobs, CLI automation, or nightly renders.
-
-## 6. Publishing this skill to ClawHub
+Publish the **skill folder** only:
 
 ```bash
-npm i -g clawhub
-clawhub auth
-clawhub skill publish ./skill/atlas-avatar \
-  --slug atlas-avatar \
-  --name "Atlas Avatar" \
-  --version 1.0.0 \
-  --tags latest
+clawhub skill publish ./skills/atlas-avatar --slug atlas-avatar --name "Atlas Avatar" --version 1.0.2 --tags latest
 ```
 
-Validate locally if your OpenClaw CLI supports it:
+## 7. Plugins
 
-```bash
-openclaw skills validate ./skill/atlas-avatar
-```
-
-*(Command availability depends on OpenClaw version.)*
-
-## 7. When to upgrade to an OpenClaw plugin
-
-Use a **plugin** (TypeScript, `openclaw.plugin.json`) if you need:
-
-- Typed tools instead of `curl`
-- Streaming responses
-- Centralized secret handling without shell
-
-The skill is the fastest path; the plugin is the production-hardening path.
+Use an OpenClaw **plugin** when you need typed tools, streaming, or no shell — the **core** CLI is the middle ground between raw curl and a full plugin.
 
 ## 8. Support
 
-- **Atlas API / keys / billing:** Atlas dashboard and support channels.
-- **OpenClaw:** [docs.openclaw.ai](https://docs.openclaw.ai) and ClawHub.
+- **Atlas:** dashboard and support.  
+- **OpenClaw:** [docs.openclaw.ai](https://docs.openclaw.ai).

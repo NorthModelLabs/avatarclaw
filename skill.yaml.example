@@ -4,7 +4,7 @@
 # Reference: https://docs.openclaw.ai/tools/clawhub
 
 name: atlas-avatar
-version: 1.0.0
+version: 1.0.2
 author: northmodellabs
 description: >
   Atlas GPU avatars — realtime LiveKit sessions and offline lip-sync video
@@ -23,5 +23,6 @@ config:
 entryPoint:
   type: natural
   prompt: |
-    Load instructions from SKILL.md in this bundle. Teach the agent to use
-    curl with ATLAS_API_BASE and ATLAS_API_KEY for Atlas avatar endpoints.
+    Load instructions from SKILL.md in this bundle. Prefer python3 core/atlas_cli.py
+    from the monorepo root (or scripts/run_atlas_cli.py with ATLAS_AGENT_REPO) with
+    ATLAS_API_KEY; fall back to curl where Python is unavailable.

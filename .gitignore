@@ -3,3 +3,7 @@
 *.log
 node_modules/
 .clawhub/
+.venv/
+venv/
+__pycache__/
+*.pyc

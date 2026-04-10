@@ -103,6 +103,6 @@ Full enum table lives on the **website** API docs. This file stays short for tok
 
 ---
 
-## OpenClaw note
+## OpenClaw / agents
 
-Skills teach curl; for production, prefer a typed OpenClaw **plugin** if you need non-shell secret handling or streaming.
+Prefer **`python3 core/atlas_cli.py …`** from the monorepo root (see `skills/atlas-avatar/SKILL.md`) for a single maintained client; **`curl`** remains valid for minimal environments. For production, a typed OpenClaw **plugin** avoids shell entirely.
