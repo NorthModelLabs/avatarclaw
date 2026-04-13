@@ -165,6 +165,7 @@ Install: `clawhub install atlas-avatar` (flags may vary — `clawhub --help`).
 
 | Path | Purpose |
 |------|---------|
+| `google-meet/` | **Meet workflow CLI** — chains `atlas_session start` + `meet_assist` (not a Meet bot); see `google-meet/README.md` |
 | `core/atlas_api.py` | Shared Atlas HTTP client |
 | `core/atlas_cli.py` | REST CLI |
 | `core/requirements.txt` | `requests` |
