@@ -17,6 +17,23 @@ import sys
 from pathlib import Path
 
 
+def _banner_livekit_not_meet(open_meet: bool) -> None:
+    print(
+        "\n"
+        "▶ Atlas realtime = LiveKit (separate from Google Meet). Nothing here joins Meet\n"
+        "  as a bot or pipes your Meet call into Atlas automatically.\n"
+        "▶ The --meet-url is only for (1) optional browser open + (2) text you paste in Meet.\n"
+        "  To show the avatar in Meet: screen-share your viewer tab, or build a Meet bot.\n",
+        file=sys.stderr,
+    )
+    if not open_meet:
+        print(
+            "▶ Tip: pass --open-meet to open THIS Meet link in your default browser (same code,\n"
+            "  another window — you still join Meet yourself; it does not connect LiveKit).\n",
+            file=sys.stderr,
+        )
+
+
 def _meet_chat_reminder() -> None:
     print(
         "\n"
@@ -155,6 +172,7 @@ def run_session_start(
 
 def cmd_up(args: argparse.Namespace) -> int:
     root = repo_root()
+    _banner_livekit_not_meet(bool(args.open_meet))
     if args.open_meet:
         run_open_meet(root, args.meet_url)
     rc = run_session_start(root, args.mode, args.face or "", args.face_url or "", Path(args.output))

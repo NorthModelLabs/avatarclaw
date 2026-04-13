@@ -43,6 +43,15 @@ python3 google-meet/meet_workflow.py open-meet --meet-url "https://meet.google.c
 python3 google-meet/meet_workflow.py paste --meet-url "..." --session-file session.json --viewer-url "https://..."
 ```
 
+## “It didn’t join the same Google Meet”
+
+**Atlas never joins Google Meet.** `meet_workflow.py up` creates a **LiveKit** room on Atlas’s side. Your `https://meet.google.com/...` link is only used to:
+
+1. Optionally **`--open-meet`** — open that **exact same Meet URL** in your **default browser** (you still click *Join*; it’s the same meeting code, not LiveKit inside Meet).
+2. **Paste text** — a draft message for Meet **chat** (you paste manually).
+
+So you are always in **two different systems**: Meet (browser/app) and LiveKit (Atlas). They only “feel” the same if **you** screen-share the avatar tab or send people a **viewer** link.
+
 ## How to test “join Meet” today (human path)
 
 There is **no** automated Meet join in this repo. You test by **you** joining the call like any participant, then attaching the avatar **outside** Meet (side tab or screen share).
