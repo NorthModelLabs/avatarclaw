@@ -4,6 +4,7 @@ Experimental **open-source** utilities you can run **on your own machine** (or l
 
 | Script | What it does |
 |--------|----------------|
+| **`local_conversation_demo.py`** | **Local “talk to the agent”:** starts Atlas **conversation** mode, serves a **127.0.0.1** web viewer (mic ↔ LiveKit), opens optional Meet link. **Meet:** Share → **this viewer tab** so the call sees/hears the avatar (not a second Meet participant). |
 | **`playwright_meet.py`** | Opens **headed Chromium** with a **persistent profile** at your Meet URL. **You** sign in and click **Join** like a normal user. |
 | **`livekit_publish_tone.py`** | Uses Atlas **`session.json`** to join the **LiveKit** room as another participant and publish a **quiet 440 Hz tone** (proves second-participant audio path for **passthrough** experiments). |
 
@@ -27,6 +28,24 @@ python3 -m venv .venv-meeting && source .venv-meeting/bin/activate  # Windows: .
 pip install -r meeting-bot/requirements.txt
 playwright install chromium
 ```
+
+---
+
+## Talk to the agent locally (recommended)
+
+```bash
+export ATLAS_API_KEY="ak_..."
+pip install -r core/requirements.txt
+python3 meeting-bot/local_conversation_demo.py \
+  --meet-url "https://meet.google.com/your-code" \
+  --face-url "https://example.com/face.jpg"
+```
+
+1. A **viewer** tab opens on `http://127.0.0.1:9876/` — allow the **microphone**; you speak **here**, not into Meet’s mic, for the Atlas agent to hear you.  
+2. If you passed **`--meet-url`**, Meet opens too — join the call, then **Present → Window** and choose the **viewer** tab so others see the avatar.  
+3. Press **Enter** in the terminal to **leave** the Atlas session and stop the local server.
+
+This is the closest “local + Meet” story without a full Meet media bot: **Meet carries your screen share of the LiveKit viewer**, not a synthetic Meet participant.
 
 ---
 
