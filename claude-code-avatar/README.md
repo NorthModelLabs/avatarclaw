@@ -34,6 +34,8 @@ In the first message, **attach context** so the agent knows Atlas rules:
 - `@claude-code-avatar/CLAUDE.md`
 - or `@skills/atlas-avatar/SKILL.md`
 
+**Fastest “HeyGen-style” pairing:** open **`PROMPTS.md`** and copy the block under **“HeyGen-style pairing (copy this whole block into Claude Code)”** — it tells Claude Code to run Goal A / B / C against this repo.
+
 ## 4. Practical test (terminal)
 
 ```bash

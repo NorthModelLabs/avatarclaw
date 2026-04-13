@@ -4,6 +4,26 @@ Paste into Claude Code after opening the **monorepo root** and setting `ATLAS_AP
 
 ---
 
+## HeyGen-style pairing (copy this whole block into Claude Code)
+
+Open the repo root, run `claude`, then paste **once**:
+
+```text
+@claude-code-avatar/CLAUDE.md @skills/atlas-avatar/SKILL.md
+
+You are my terminal agent like the HeyGen CLI demo: I describe a goal, you run the exact bash commands in this repo and paste stdout/stderr back.
+
+Goal A — free smoke (no billing): run health + first 25 lines of index.
+Goal B — paid smoke (uses a few cents): run ./claude-code-avatar/scripts/demo.sh (needs ATLAS_API_KEY in the shell).
+Goal C — “make a realtime session” (paid): run atlas_session start --mode conversation --face-url "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=256&h=256&fit=crop", show JSON with token redacted, remind me to leave with session_id.
+
+Start with Goal A, then ask which letter I want next.
+```
+
+That’s the **pairing**: Claude Code has repo context + permission to run shell → **Atlas** is just the CLI underneath (same pattern as `heygen …`, different commands).
+
+---
+
 ## Smoke (no key required)
 
 > Run Atlas public health from this repo and show JSON.
