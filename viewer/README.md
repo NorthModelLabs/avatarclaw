@@ -87,4 +87,8 @@ function playTtsAudio(base64Audio: string) {
 - TTS plays → `BufferSource` connects to same destination → avatar lip-syncs
 - TTS ends → `BufferSource` disconnects → back to idle
 
+**Performance tip:** Split LLM and TTS into separate requests (`/api/chat` for text, `/api/tts` for audio). Text appears instantly while TTS generates in the background, cutting perceived latency by 2-3 seconds.
+
+**Voice input (STT):** Use [ElevenLabs Scribe v2](https://www.npmjs.com/package/@elevenlabs/react) (`useScribe` hook) instead of the browser's Web Speech API. The Web Speech API picks up the avatar's TTS audio from the speakers, causing a feedback loop where the avatar talks to itself. Scribe connects to the mic with `echoCancellation: true`, so the browser's built-in AEC strips speaker output at the hardware level before it reaches the STT model. See the [example app README](https://github.com/NorthModelLabs/atlas-realtime-example) for the full implementation with token endpoint and React hook patterns.
+
 Full example app: **[atlas-realtime-example](https://github.com/NorthModelLabs/atlas-realtime-example)** | API docs: **[northmodellabs.com/api](https://www.northmodellabs.com/api)**

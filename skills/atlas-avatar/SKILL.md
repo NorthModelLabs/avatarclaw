@@ -250,6 +250,8 @@ function playTtsAudio(base64Audio: string) {
 - **Idle:** silence flows → GPU renders idle animation (avatar stays alive)
 - **TTS:** `BufferSource` connects → audio flows → avatar lip-syncs
 - **TTS ends:** `BufferSource` disconnects → back to silence → smooth return to idle
+- **Latency tip:** Split LLM (`/api/chat`) and TTS (`/api/tts`) into separate requests — text shows instantly, audio follows
+- **Voice input (STT):** Use ElevenLabs Scribe v2 (`@elevenlabs/react` `useScribe` hook) instead of the Web Speech API — it connects to the mic with `echoCancellation: true`, so the browser's AEC strips speaker output before it reaches the STT model, preventing the avatar from talking to itself
 
 Full React/Next.js example: [atlas-realtime-example](https://github.com/NorthModelLabs/atlas-realtime-example) | [API docs](https://www.northmodellabs.com/api)
 
