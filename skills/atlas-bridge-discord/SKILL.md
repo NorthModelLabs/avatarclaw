@@ -1,7 +1,7 @@
 ---
 name: atlas_bridge_discord
-description: "Post Atlas avatar session info via incoming webhook: text, rich embed with viewer URL, optional MP4 attachment. Use after atlas_session start or offline render — not a voice/video bot inside calls."
-version: "0.2.0"
+description: "Post Atlas avatar session info via incoming webhook, or run an optional Discord bot: /ask, @mention, and reply-to-bot (Claude + lip-sync MP4); /generate (verbatim). Not a voice-channel bot."
+version: "0.3.0"
 tags: ["atlas", "discord", "webhook", "bridge", "openclaw"]
 author: "northmodellabs"
 metadata:
@@ -11,9 +11,11 @@ metadata:
       bins: [python3]
 ---
 
-# Atlas → team chat (webhook bridge)
+# Atlas → team chat (webhook + optional bot)
 
-Posts to a text channel via **incoming webhook** URL. This matches an **avatar agent** story: participants open your **browser viewer** from the channel, or you attach a **short finished video** — not live streaming into voice channels.
+**Webhook** — post to a channel via **incoming webhook** URL (one-way): session summary, links, optional MP4 attach.
+
+**Optional bot** (`skills/atlas-bridge-discord/scripts/discord_avatar_bot.py`) — **24/7 process you host** (e.g. `./scripts/bridges/run-discord-avatar-bot.sh`). Slash **`/ask`** or **`@BotName …`**: **Claude** → **Answer:** + MP4 (avatar speaks the answer). **Reply** to any bot message with text: same with prior message as context. Slash **`/generate`**: **verbatim** script → MP4. LLM paths need **`HELICONE_API_KEY`** (default: Helicone AI Gateway) or **`ANTHROPIC_API_KEY`** (direct); optional **`HELICONE_ANTHROPIC_PROXY=1`** with both keys for legacy **`anthropic.helicone.ai`**. **`DISCORD_MESSAGE_CONTENT_INTENT=1`** + Portal toggle for replies and @mentions. This is **not** live WebRTC in a voice channel.
 
 ### What gets posted (`DISCORD_MESSAGE_STYLE`)
 
@@ -25,16 +27,28 @@ Posts to a text channel via **incoming webhook** URL. This matches an **avatar a
 - Does **not** join **voice** channels or stream realtime WebRTC into calls (needs a full bot + media gateway + bridge to LiveKit — separate product).
 - Does **not** host the **browser viewer** — use your app or the planned **`viewer/`** local UI in this repo.
 
-## Prerequisites
+## Prerequisites (webhook)
 
 1. Channel → Integrations → Webhooks → copy URL.
-2. `export DISCORD_WEBHOOK_URL="https://example.com/api/webhooks/..."`  # replace with your real webhook URL
+2. `export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..."`  # your real webhook URL
 
-## Usage
+## Interactive bot (optional)
+
+1. [Discord Developer Portal](https://discord.com/developers/applications) → **New Application** → **Bot** → copy **Token** → `DISCORD_BOT_TOKEN` in `.env` (never commit).
+2. **Privileged Gateway Intents** → enable **Message Content Intent** in the Portal **only if** you want **@mention** text; in `.env` also set **`DISCORD_MESSAGE_CONTENT_INTENT=1`** (the bot keeps this intent off by default so login works before you toggle the Portal). **`/ask`** works without Message Content.
+3. **OAuth2 → URL Generator** (not the short **Installation** link alone): scopes **`bot`** + **`applications.commands`**; if shown, **Integration type → Guild install**; bot permissions at least **Send Messages**, **Attach Files**, **Read Message History**, **Use Slash Commands**, and **View channel**. The **Generated URL** must include `scope=bot` and `applications.commands` — otherwise the app can appear under Integrations with **“no bot in this server”**, `@mention` will not work, and the Python bot logs **`in 0 server(s)`**. Open the long URL, authorize into your server.
+4. `pip install -r skills/atlas-bridge-discord/requirements.txt` (includes `discord.py`).
+5. `./scripts/bridges/run-discord-avatar-bot.sh` from repo root (loads `.env`, optional venv).
+
+**Slash commands:** Global registration can lag; Discord may show **“This command is outdated”** until the client refreshes — **reload Discord (Ctrl+R)** and re-pick the command from `/`. Set **`DISCORD_GUILD_ID`** in `.env` (your server’s numeric id) to register **`/ask`** and **`/generate`** only in that server — **sync is immediate** (see root README). **@mentions** work once the bot is online if **Message Content Intent** is enabled.
+
+**Env:** `DISCORD_BOT_TOKEN`, `ATLAS_API_KEY`; for **`/ask`** / **reply-to-bot**: `HELICONE_API_KEY` (gateway default) or `ANTHROPIC_API_KEY` (direct). `LLM_MODEL` defaults to `claude-sonnet-4` (gateway) or `claude-sonnet-4-20250514` (native). `HELICONE_ANTHROPIC_PROXY=1` + both keys → legacy proxy. Optional `ELEVENLABS_API_KEY` / `ELEVENLABS_VOICE_ID`, `ATLAS_OFFLINE_IMAGE`.
+
+## Usage (webhook)
 
 ```bash
 pip install -r skills/atlas-bridge-discord/requirements.txt
-export DISCORD_WEBHOOK_URL="https://example.com/api/webhooks/..."
+export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..."
 python3 skills/atlas-bridge-discord/scripts/post_session.py --file session.json
 ```
 
@@ -93,4 +107,4 @@ You should see one message with a playable **file** attachment (`session_id` `di
 
 ## Security
 
-Webhook URL is a secret. Do not commit it. Do not post LiveKit `token` values into public channels.
+Webhook URL and **bot token** are secrets — do not commit them. Do not post LiveKit `token` values into public channels. Rate-limit or restrict the bot to trusted channels if renders cost money.
