@@ -217,9 +217,41 @@ JSON uses **`error`** + **`message`**. Full table: Atlas website → API docs �
 
 ## Passthrough mode — persistent audio track
 
-When using **passthrough** mode with a browser client, use the **persistent audio track pattern**: publish a single `MediaStreamDestination` to the LiveKit room for the entire session. It outputs silence when idle (keeping the avatar animated) and TTS audio when speaking. **Do not** call `publishAudio()` directly — it tears down the track after each call, causing the avatar to freeze between messages.
+When using **passthrough** mode with a browser client, use the **persistent audio track pattern**. **Do not** call `publishAudio()` directly — it tears down the track after each call, causing the avatar to freeze between messages.
 
-Full copy-paste code: [atlas-realtime-example README](https://github.com/NorthModelLabs/atlas-realtime-example) and [API docs](https://www.northmodellabs.com/api).
+```typescript
+import { LocalAudioTrack, Track } from "livekit-client";
+
+// On connect: publish ONE silent track for the entire session
+const audioCtx = new AudioContext();
+const dest = audioCtx.createMediaStreamDestination();
+const lkTrack = new LocalAudioTrack(dest.stream.getAudioTracks()[0]);
+await room.localParticipant.publishTrack(lkTrack, {
+  name: "tts-audio",
+  source: Track.Source.Unknown,
+});
+
+// Play TTS: connect a BufferSource to the SAME destination
+function playTtsAudio(base64Audio: string) {
+  const binary = atob(base64Audio);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+  audioCtx.decodeAudioData(bytes.buffer.slice(0)).then((buf) => {
+    const source = audioCtx.createBufferSource();
+    source.buffer = buf;
+    source.connect(dest);
+    source.onended = () => source.disconnect();
+    source.start(); // avatar lip-syncs; when done → back to silence → idle animation
+  });
+}
+```
+
+- **Idle:** silence flows → GPU renders idle animation (avatar stays alive)
+- **TTS:** `BufferSource` connects → audio flows → avatar lip-syncs
+- **TTS ends:** `BufferSource` disconnects → back to silence → smooth return to idle
+
+Full React/Next.js example: [atlas-realtime-example](https://github.com/NorthModelLabs/atlas-realtime-example) | [API docs](https://www.northmodellabs.com/api)
 
 ## OpenClaw as LLM
 
