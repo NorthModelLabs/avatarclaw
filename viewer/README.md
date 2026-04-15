@@ -7,7 +7,7 @@
 
 **How to get there:** host a static or Next.js page that uses **[@northmodellabs/atlas-react](https://www.npmjs.com/package/@northmodellabs/atlas-react)** (or your own LiveKit client) and mints or receives the session payload from a tiny local API you control.
 
-This folder is reserved for that app. Until it lands, use **`python3 skills/atlas-avatar/scripts/atlas_session.py start …`** and any HTTPS viewer you already deploy.
+This folder is reserved for that app. **Until it lands:** use the official **[atlas-realtime-example](https://github.com/NorthModelLabs/atlas-realtime-example)** (host UI + **`/watch/[id]`** for **`POST /v1/realtime/session/{id}/viewer`**), **[northmodellabs.com/examples](https://www.northmodellabs.com/examples)** for hosted demos, or **`python3 skills/atlas-avatar/scripts/atlas_session.py start …`** / **`viewer-token --session-id …`** plus any HTTPS viewer you deploy.
 
 ## Passthrough mode — persistent audio track
 

@@ -2,7 +2,7 @@
 
 When driving **North Model Labs Atlas** from this repo, read the full skill and path notes:
 
-- **`skills/atlas-avatar/SKILL.md`** — commands, env (`ATLAS_API_KEY`), offline/realtime/jobs, curl fallbacks, billing (`leave` after realtime).
+- **`skills/atlas-avatar/SKILL.md`** — commands, env (`ATLAS_API_KEY`), offline/realtime/jobs, **`viewer-token`** (multi-viewer), curl fallbacks, billing (`leave` after realtime); **`references/api-reference.md`** + [northmodellabs.com/api](https://www.northmodellabs.com/api).
 - **`claude-code-avatar/CLAUDE.md`** — cwd vs `../` paths, safety habits.
 
 **Quick commands** (from repo root; needs venv + `pip install -r core/requirements.txt`):

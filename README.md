@@ -59,7 +59,7 @@ Copy a skill into your agent workspace (e.g. `~/.openclaw/workspace/skills/`) or
 
 | Skill | Pricing (source of truth) | What it does |
 |-------|---------------------------|--------------|
-| **`skills/atlas-avatar/`** | Dashboard + API `pricing` / `GET /v1/me` | Core Atlas API: realtime sessions, offline jobs, jobs poll, face-swap — `SKILL.md` + **`atlas_session.py`** verb CLI + **`run_atlas_cli.py`**. |
+| **`skills/atlas-avatar/`** | Dashboard + API `pricing` / `GET /v1/me` | Core Atlas API: realtime sessions, **`POST …/viewer`** watch tokens, offline jobs, jobs poll, face-swap — `SKILL.md` + **`atlas_session.py`** verb CLI + **`run_atlas_cli.py`**. |
 | **`skills/atlas-bridge-slack/`** | Webhook + your Slack app (provider billing is yours) | **Incoming webhook** text/link + optional **bot token** MP4 upload (`post_session.py`, `scripts/bridges/atlas-offline-to-slack.sh`). |
 | **`skills/atlas-bridge-discord/`** | Webhook only | Post summary + optional **`viewer_url`** embed + optional **MP4** attach; optional **bot**: **`/ask`** + **@mention** (Claude answer → lip-sync), **`/generate`** (verbatim script). |
 
@@ -245,7 +245,7 @@ clawhub login
 clawhub skill publish ./skills/atlas-avatar \
   --slug atlas-avatar \
   --name "Atlas Avatar" \
-  --version 1.0.3 \
+  --version 1.0.4 \
   --tags latest
 ```
 
@@ -291,6 +291,7 @@ Install: `clawhub install atlas-avatar` (flags may vary — `clawhub --help`).
 | `scripts/README.md` | Index of Python CLIs vs `scripts/bridges/*.sh` |
 | `scripts/bridges/verify-env.sh` | Health + `/v1/me` |
 | `scripts/bridges/smoke-atlas.sh` | Smoke tests (optional realtime if `ATLAS_API_KEY` set) |
+| `scripts/bridges/test-atlas-api-harness.py` | Full **`atlas_api.py`** surface: status, me, jobs, realtime create→get→viewer→delete (use `--no-realtime` to skip billing); optional offline + `--probe-avatar-session` |
 | `scripts/bridges/test-slack-webhook.sh` | Posts a **fake** session line to Slack when `SLACK_WEBHOOK_URL` is set |
 | `scripts/bridges/test-slack-video-link.sh` | Slack: text + **render URL** |
 | `scripts/bridges/test-discord-webhook.sh` | Discord smoke (text + embed) |

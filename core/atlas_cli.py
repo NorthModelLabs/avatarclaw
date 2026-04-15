@@ -53,6 +53,10 @@ def cmd_realtime_delete(args: argparse.Namespace) -> int:
     return api.emit_response(api.api_realtime_delete(args.session_id))
 
 
+def cmd_realtime_viewer(args: argparse.Namespace) -> int:
+    return api.emit_response(api.api_realtime_viewer(args.session_id))
+
+
 def cmd_generate(args: argparse.Namespace) -> int:
     cb = args.callback_url or None
     return api.emit_response(api.api_generate(args.audio, args.image, cb))
@@ -118,6 +122,13 @@ def build_parser() -> argparse.ArgumentParser:
     d = rts.add_parser("delete", help="DELETE /v1/realtime/session/{id}")
     d.add_argument("session_id")
     d.set_defaults(fn=cmd_realtime_delete)
+
+    vw = rts.add_parser(
+        "viewer",
+        help="POST /v1/realtime/session/{id}/viewer (view-only LiveKit token)",
+    )
+    vw.add_argument("session_id")
+    vw.set_defaults(fn=cmd_realtime_viewer)
 
     gen = sub.add_parser("generate", help="POST /v1/generate (offline video job)")
     gen.add_argument("--audio", required=True)

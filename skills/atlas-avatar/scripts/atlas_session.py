@@ -13,6 +13,7 @@ Usage:
   python atlas_session.py status --session-id ID
   python atlas_session.py face-swap --session-id ID --face PATH
   python atlas_session.py leave --session-id ID
+  python atlas_session.py viewer-token --session-id ID
   python atlas_session.py offline --audio PATH --image PATH [--callback-url URL]
   python atlas_session.py jobs-list [--limit N] [--offset N]
   python atlas_session.py jobs-wait JOB_ID [--interval 2] [--timeout 600]
@@ -77,6 +78,15 @@ def main() -> None:
     lv = sub.add_parser("leave", help="DELETE realtime session (billing + teardown)")
     lv.add_argument("--session-id", required=True, dest="session_id")
     lv.set_defaults(fn=lambda a: api.emit_response(api.api_realtime_delete(a.session_id)))
+
+    vw = sub.add_parser(
+        "viewer-token",
+        help="POST …/realtime/session/{id}/viewer — view-only LiveKit token (multi-viewer)",
+    )
+    vw.add_argument("--session-id", required=True, dest="session_id")
+    vw.set_defaults(
+        fn=lambda a: api.emit_response(api.api_realtime_viewer(a.session_id))
+    )
 
     off = sub.add_parser("offline", help="POST /v1/generate (async video job)")
     off.add_argument("--audio", required=True)

@@ -128,6 +128,19 @@ def api_realtime_delete(session_id: str) -> requests.Response:
     )
 
 
+def api_realtime_viewer(session_id: str) -> requests.Response:
+    """POST /v1/realtime/session/{id}/viewer — view-only LiveKit token (multi-viewer)."""
+    sid = (session_id or "").strip()
+    if not sid:
+        eprint("Error: session_id is required.")
+        sys.exit(2)
+    return requests.post(
+        f"{base_url()}/v1/realtime/session/{sid}/viewer",
+        headers={**auth_headers(required=True)},
+        timeout=60,
+    )
+
+
 def api_generate(audio: str, image: str, callback_url: str | None) -> requests.Response:
     ap = Path(audio)
     ip = Path(image)

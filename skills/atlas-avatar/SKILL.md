@@ -1,7 +1,7 @@
 ---
 name: atlas_avatar
-description: "Create realtime AI avatar sessions (LiveKit WebRTC) and offline lip-sync avatar videos using the Atlas API by North Model Labs. Post offline MP4 renders to Discord (webhook). Use when the user asks for Atlas avatar, talking head, realtime avatar, face animation, video from audio+image, lip sync, BYOB TTS + /v1/generate, Discord delivery of renders, or GPU avatar rendering."
-version: "1.0.3"
+description: "Create realtime AI avatar sessions (LiveKit WebRTC), view-only viewer tokens for multi-viewer watch, and offline lip-sync avatar videos using the Atlas API by North Model Labs. Post offline MP4 renders to Discord (webhook). Use when the user asks for Atlas avatar, talking head, realtime avatar, face animation, video from audio+image, lip sync, BYOB TTS + /v1/generate, watch-only audience, Discord delivery of renders, or GPU avatar rendering."
+version: "1.0.4"
 tags: ["avatar", "video", "realtime", "livekit", "lip-sync", "atlas", "gpu", "openclaw"]
 author: "northmodellabs"
 metadata:
@@ -17,6 +17,8 @@ Server version: check `GET /` → `version` (docs may lag production).
 
 Atlas provides **realtime** sessions (LiveKit) and **async** offline jobs (`POST /v1/generate` → poll → result). API keys: [North Model Labs dashboard](https://dashboard.northmodellabs.com/dashboard/keys).
 
+**Full API surface** (error codes, webhook signature verification, limits): [northmodellabs.com/api](https://www.northmodellabs.com/api). **Live examples** in the browser: [northmodellabs.com/examples](https://www.northmodellabs.com/examples).
+
 ## Configuration
 
 | Variable | Required | Default |
@@ -27,11 +29,13 @@ Atlas provides **realtime** sessions (LiveKit) and **async** offline jobs (`POST
 
 **Python deps:** `pip install -r core/requirements.txt` or `pip install -r skills/atlas-avatar/requirements.txt` (same pins). Prefer a **venv**.
 
+**Regression harness** (every endpoint in `core/atlas_api.py`; realtime **costs** unless `--no-realtime`): from repo root, `python3 scripts/bridges/test-atlas-api-harness.py --help`. Lighter smoke: `./scripts/bridges/smoke-atlas.sh`.
+
 ---
 
-## Preferred for agents: `skills/atlas-avatar/scripts/atlas_session.py` (verb CLI: start / leave / face-swap / …)
+## Preferred for agents: `skills/atlas-avatar/scripts/atlas_session.py` (verb CLI: start / leave / face-swap / viewer-token / …)
 
-One entrypoint with **`start` / `leave` / `face-swap`** style commands. This only calls the **Atlas HTTP API** — it does **not** join third-party meeting apps. After **`start`**, use `livekit_url`, `token`, and `room` in a **WebRTC viewer** that speaks the LiveKit client protocol ([sample apps](https://github.com/NorthModelLabs/atlas-realtime-example), [`@northmodellabs/atlas-react`](https://www.npmjs.com/package/@northmodellabs/atlas-react)).
+One entrypoint with **`start` / `leave` / `face-swap` / `viewer-token`** style commands. This only calls the **Atlas HTTP API** — it does **not** join third-party meeting apps. After **`start`**, use `livekit_url`, `token`, and `room` in a **WebRTC viewer** that speaks the LiveKit client protocol ([sample apps](https://github.com/NorthModelLabs/atlas-realtime-example), [`@northmodellabs/atlas-react`](https://www.npmjs.com/package/@northmodellabs/atlas-react)). For **extra watchers** on the same session (no extra GPU), call **`viewer-token`** (see `references/api-reference.md` → `POST …/viewer`).
 
 From the **monorepo root**:
 
@@ -42,6 +46,7 @@ python3 skills/atlas-avatar/scripts/atlas_session.py start --mode passthrough --
 python3 skills/atlas-avatar/scripts/atlas_session.py status --session-id SESSION_ID
 python3 skills/atlas-avatar/scripts/atlas_session.py face-swap --session-id SESSION_ID --face /path/to/new.jpg
 python3 skills/atlas-avatar/scripts/atlas_session.py leave --session-id SESSION_ID
+python3 skills/atlas-avatar/scripts/atlas_session.py viewer-token --session-id SESSION_ID
 python3 skills/atlas-avatar/scripts/atlas_session.py offline --audio speech.mp3 --image face.jpg
 python3 skills/atlas-avatar/scripts/atlas_session.py jobs-wait JOB_ID
 python3 skills/atlas-avatar/scripts/atlas_session.py jobs-result JOB_ID
@@ -89,6 +94,7 @@ python3 core/atlas_cli.py realtime create --mode passthrough --face /path/to/fac
 python3 core/atlas_cli.py realtime get SESSION_ID
 python3 core/atlas_cli.py realtime patch SESSION_ID --face /path/to/new_face.jpg
 python3 core/atlas_cli.py realtime delete SESSION_ID
+python3 core/atlas_cli.py realtime viewer SESSION_ID
 python3 core/atlas_cli.py generate --audio speech.mp3 --image face.jpg
 python3 core/atlas_cli.py jobs list --limit 20
 python3 core/atlas_cli.py jobs get JOB_ID
@@ -205,6 +211,15 @@ curl -sS -X DELETE "${ATLAS_API_BASE:-https://api.atlasv1.com}/v1/realtime/sessi
   -H "Authorization: Bearer ${ATLAS_API_KEY}"
 ```
 
+### POST — view-only token (multi-viewer)
+
+```bash
+curl -sS -X POST "${ATLAS_API_BASE:-https://api.atlasv1.com}/v1/realtime/session/SESSION_ID/viewer" \
+  -H "Authorization: Bearer ${ATLAS_API_KEY}"
+```
+
+**200:** JSON with **`token`**, **`livekit_url`**, **`room`**, and viewer metadata (`viewer_id`, `role`, …). Connect with **livekit-client** subscribe-only; do not expose raw JWTs in public channels.
+
 ### Plugin — BYO LiveKit
 
 `POST /v1/avatar/session` — see `references/api-reference.md`.
@@ -213,7 +228,7 @@ curl -sS -X DELETE "${ATLAS_API_BASE:-https://api.atlasv1.com}/v1/realtime/sessi
 
 ## Errors (short)
 
-JSON uses **`error`** + **`message`**. Full table: Atlas website → API docs → Error Responses.
+JSON uses **`error`** + **`message`**. Full table: [API docs → Error Responses](https://www.northmodellabs.com/api#errors). Webhook verification: [Webhooks](https://www.northmodellabs.com/api#webhooks).
 
 ## Passthrough mode — persistent audio track
 
@@ -253,7 +268,7 @@ function playTtsAudio(base64Audio: string) {
 - **Latency tip:** Split LLM (`/api/chat`) and TTS (`/api/tts`) into separate requests — text shows instantly, audio follows
 - **Voice input (STT):** Use ElevenLabs Scribe v2 (`@elevenlabs/react` `useScribe` hook) instead of the Web Speech API — it connects to the mic with `echoCancellation: true`, so the browser's AEC strips speaker output before it reaches the STT model, preventing the avatar from talking to itself
 
-Full React/Next.js example: [atlas-realtime-example](https://github.com/NorthModelLabs/atlas-realtime-example) | [API docs](https://www.northmodellabs.com/api)
+Full React/Next.js example (host + **`/watch/[id]`** viewer flow): [atlas-realtime-example](https://github.com/NorthModelLabs/atlas-realtime-example) | [API docs](https://www.northmodellabs.com/api) | [Examples](https://www.northmodellabs.com/examples)
 
 ## OpenClaw as LLM
 
