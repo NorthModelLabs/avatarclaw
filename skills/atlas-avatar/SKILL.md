@@ -1,7 +1,7 @@
 ---
 name: atlas_avatar
 description: "Create realtime **passthrough** AI avatar sessions (LiveKit WebRTC — you bring STT/LLM/TTS and publish audio), view-only viewer tokens for multi-viewer watch, and offline lip-sync avatar videos using the Atlas API by North Model Labs. Post offline MP4 renders to Discord (webhook). Use when the user asks for Atlas avatar, talking head, realtime avatar, face animation, video from audio+image, lip sync, BYOB TTS + /v1/generate, watch-only audience, Discord delivery of renders, or GPU avatar rendering."
-version: "1.0.5"
+version: "1.0.6"
 tags: ["avatar", "video", "realtime", "livekit", "lip-sync", "atlas", "gpu", "openclaw"]
 author: "northmodellabs"
 metadata:
@@ -53,6 +53,19 @@ python3 skills/atlas-avatar/scripts/atlas_session.py jobs-result JOB_ID
 ```
 
 If the skill lives without `core/` nearby, set **`ATLAS_AGENT_REPO=/absolute/path/to/monorepo`**.
+
+### Viewer (optional) — see and hear the avatar
+
+Agents (OpenClaw, terminal CLIs, **Clawbot**) **do not need to clone anything** to **call Atlas**: `start` / `leave` / `viewer-token` and `curl` only need **`ATLAS_API_KEY`** (and network). **Video and mic** use a **normal browser** (WebRTC), not the chat window.
+
+| Goal | What to do |
+|------|------------|
+| **Full passthrough UI** (mic, face, optional `/watch/[id]` for viewers) | Clone **[atlas-realtime-example](https://github.com/NorthModelLabs/atlas-realtime-example)**, add `.env.local` with the **same** `ATLAS_API_KEY` / `ATLAS_API_URL` as your agent, `npm install`, `npm run dev`, then after `start` open **`http://localhost:3000/watch/<session_id>`** (or the host URL from that app). Same key = viewer token route works for any active `session_id` your agent created. |
+| **Try hosted demos** | **[northmodellabs.com/examples](https://www.northmodellabs.com/examples)** — no clone required to explore the product. |
+| **Scripts, harness, Discord/Slack bridges** in this pack | Clone **[this monorepo](https://github.com/NorthModelLabs/avatarclaw)** (or set **`ATLAS_AGENT_REPO`** to its root) so `core/` and `scripts/bridges/` exist on disk. |
+| **Minimal future default in this repo** | See **`viewer/README.md`** (planned local page). |
+
+Do **not** treat “clone the skills monorepo” as mandatory for every user — only for **full tooling** or when the agent must run paths under `scripts/` or `core/`.
 
 ### One-shot: Atlas offline MP4 → Discord channel
 
