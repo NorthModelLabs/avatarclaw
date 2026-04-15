@@ -242,7 +242,7 @@ Leave that terminal open while you test. In Discord: **`/ask`** or **`@BotName h
 ```bash
 npm i -g clawhub
 clawhub login
-clawhub skill publish ./skills/atlas-avatar \
+clawhub publish ./skills/atlas-avatar \
   --slug atlas-avatar \
   --name "Atlas Avatar" \
   --version 1.0.4 \
