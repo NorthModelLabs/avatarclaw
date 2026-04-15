@@ -7,7 +7,7 @@
   ``anthropic.helicone.ai`` + BYOK: set ``HELICONE_ANTHROPIC_PROXY=1`` with **both** keys.
   ``LLM_MODEL`` defaults to ``claude-sonnet-4`` (gateway) or ``claude-sonnet-4-20250514`` (native Anthropic).
 - **Reply to any of the bot's messages** with text — same LLM + lip-sync as ``/ask``, but the model sees
-  your **previous bot message** as context (conversation-style, like replying in Grok).
+  your **previous bot message** as context (thread-style, like replying in Grok).
 - **``/generate``** — lip-sync **exactly** the ``script`` you type (verbatim).
 - **@mention** — same as **``/ask``**: natural **Claude** reply + **Answer:** + MP4 (text after the mention is the prompt).
 

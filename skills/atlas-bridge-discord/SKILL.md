@@ -69,7 +69,7 @@ Example merged payload:
 {
   "session_id": "…",
   "room": "…",
-  "mode": "conversation",
+  "mode": "passthrough",
   "viewer_url": "https://yourapp.com/avatar/abc123"
 }
 ```

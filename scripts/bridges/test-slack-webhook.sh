@@ -32,7 +32,7 @@ cat >"$TMP" <<'EOF'
 {
   "session_id": "atlas-bridge-smoke",
   "room": "smoke-room",
-  "mode": "conversation",
+  "mode": "passthrough",
   "bridge_note": "Slack webhook smoke test — if you see this, the bridge is working."
 }
 EOF

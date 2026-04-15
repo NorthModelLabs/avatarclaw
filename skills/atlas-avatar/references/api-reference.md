@@ -51,12 +51,14 @@ Presigned download JSON: `url`, `content_type`, `expires_in`.
 
 ### `POST /v1/realtime/session`
 
-**JSON:** `{ "mode": "conversation"|"passthrough", "face_url": "https://..." }`  
-**Multipart:** `mode`, optional `face` file.
+**This monorepo / skill uses `mode: "passthrough"` only** (BYO STT/LLM/TTS; you publish audio to LiveKit). The public API may document other modes on [northmodellabs.com/api](https://www.northmodellabs.com/api).
 
-**200:** `session_id`, `livekit_url`, `token`, `room`, `mode`, `max_duration_seconds`, **`pricing`** (API-defined string; varies by `mode`).
+**JSON:** `{ "mode": "passthrough", "face_url": "https://..." }`  
+**Multipart:** `mode=passthrough`, optional `face` file.
 
-**Passthrough audio:** In `passthrough` mode, use a **persistent audio track** — publish a single `MediaStreamDestination` track for the entire session (silence when idle, TTS audio when speaking). Do **not** call `publishAudio()` repeatedly — it tears down the track after each call, causing the avatar to freeze. See the [realtime example app](https://github.com/NorthModelLabs/atlas-realtime-example) README for the full pattern.
+**200:** `session_id`, `livekit_url`, `token`, `room`, `mode`, `max_duration_seconds`, **`pricing`** (API-defined string; see dashboard).
+
+**Passthrough audio:** use a **persistent audio track** — publish a single `MediaStreamDestination` track for the entire session (silence when idle, TTS audio when speaking). Do **not** call `publishAudio()` repeatedly — it tears down the track after each call, causing the avatar to freeze. See the [realtime example app](https://github.com/NorthModelLabs/atlas-realtime-example) README for the full pattern.
 
 ### `GET /v1/realtime/session/{id}`
 

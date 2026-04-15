@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 # Copyright North Model Labs — MIT (see repo LICENSE)
-"""Atlas realtime + offline avatar — agent-facing verb CLI (start, leave, face-swap, jobs, …).
+"""Atlas realtime (**passthrough** only) + offline avatar — agent-facing verb CLI.
 
-This is **not** a meeting bot: it calls the Atlas HTTP API only. After ``start``,
-connect a LiveKit client (web / @northmodellabs/atlas-react) using ``livekit_url``,
-``token``, and ``room`` from the JSON output.
+This is **not** a meeting bot: it calls the Atlas HTTP API only. ``start`` always
+uses ``mode=passthrough`` (BYO STT/LLM/TTS; you publish audio in your viewer). After
+``start``, connect a LiveKit client (web / @northmodellabs/atlas-react) using
+``livekit_url``, ``token``, and ``room`` from the JSON output.
 
 Requires ATLAS_API_KEY. Optional ATLAS_API_BASE (default https://api.atlasv1.com).
 
 Usage:
-  python atlas_session.py start [--mode conversation|passthrough] [--face PATH] [--face-url URL]
+  python atlas_session.py start [--face PATH] [--face-url URL]
   python atlas_session.py status --session-id ID
   python atlas_session.py face-swap --session-id ID --face PATH
   python atlas_session.py leave --session-id ID
@@ -56,13 +57,15 @@ def main() -> None:
     )
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    s = sub.add_parser("start", help="Create realtime session (POST /v1/realtime/session)")
-    s.add_argument("--mode", choices=("conversation", "passthrough"), default="conversation")
+    s = sub.add_parser(
+        "start",
+        help="Create realtime passthrough session (POST /v1/realtime/session, mode=passthrough)",
+    )
     s.add_argument("--face", default="", help="Local face image (multipart)")
     s.add_argument("--face-url", default="", dest="face_url", help="HTTPS face URL (JSON)")
     s.set_defaults(
         fn=lambda a: api.emit_response(
-            api.api_realtime_create(a.mode, a.face or None, a.face_url or None)
+            api.api_realtime_create("passthrough", a.face or None, a.face_url or None)
         )
     )
 

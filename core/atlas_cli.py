@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Atlas API — unified CLI (uses atlas_api.py). Server version: GET / → version.
 
-Uses ATLAS_API_KEY and optional ATLAS_API_BASE (default https://api.atlasv1.com).
+Realtime ``create`` is **passthrough** only. Uses ATLAS_API_KEY and optional
+ATLAS_API_BASE (default https://api.atlasv1.com).
 
 Exit codes: 0 ok, 2 validation/config, 3 HTTP error from API.
 """
@@ -35,10 +36,9 @@ def cmd_me(_: argparse.Namespace) -> int:
 
 
 def cmd_realtime_create(args: argparse.Namespace) -> int:
-    mode = args.mode or "conversation"
     face = args.face or None
     face_url = args.face_url or None
-    return api.emit_response(api.api_realtime_create(mode, face, face_url))
+    return api.emit_response(api.api_realtime_create("passthrough", face, face_url))
 
 
 def cmd_realtime_get(args: argparse.Namespace) -> int:
@@ -104,8 +104,7 @@ def build_parser() -> argparse.ArgumentParser:
     rt = sub.add_parser("realtime", help="Realtime LiveKit sessions")
     rts = rt.add_subparsers(dest="rtc", required=True)
 
-    c = rts.add_parser("create", help="POST /v1/realtime/session")
-    c.add_argument("--mode", choices=("conversation", "passthrough"), default="conversation")
+    c = rts.add_parser("create", help="POST /v1/realtime/session (passthrough only)")
     c.add_argument("--face-url", dest="face_url", default="", help="HTTPS URL (JSON body)")
     c.add_argument("--face", default="", help="Local image file (multipart)")
     c.set_defaults(fn=cmd_realtime_create)

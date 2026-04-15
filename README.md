@@ -21,7 +21,7 @@ This pack is **API-first**: you get `livekit_url`, `token`, and `room` from Atla
 
 **Atlas** is North Model Labs’ developer API for AI avatars:
 
-- **Realtime** — `POST /v1/realtime/session` returns LiveKit credentials; **`conversation`** mode uses Atlas STT → LLM → TTS → avatar, or **`passthrough`** for your own audio pipeline.
+- **Realtime (passthrough)** — `POST /v1/realtime/session` with **`mode: passthrough`** returns LiveKit credentials; you bring **STT / LLM / TTS** and publish audio; Atlas provides **GPU lip-sync** video.
 - **Offline** — `POST /v1/generate` queues lip-sync video from your audio + image; poll jobs and fetch a presigned result URL.
 - **Face swap mid-session** — `PATCH /v1/realtime/session/{id}` with a new face image.
 
@@ -123,7 +123,7 @@ Start an OpenClaw session and ask for a realtime avatar or offline render — th
 
 ```bash
 python3 skills/atlas-avatar/scripts/atlas_session.py health
-python3 skills/atlas-avatar/scripts/atlas_session.py start --mode conversation --face-url "https://example.com/face.jpg"
+python3 skills/atlas-avatar/scripts/atlas_session.py start --face-url "https://example.com/face.jpg"
 python3 skills/atlas-avatar/scripts/atlas_session.py leave --session-id SESSION_ID
 ```
 
@@ -245,7 +245,7 @@ clawhub login
 clawhub publish ./skills/atlas-avatar \
   --slug atlas-avatar \
   --name "Atlas Avatar" \
-  --version 1.0.4 \
+  --version 1.0.5 \
   --tags latest
 ```
 

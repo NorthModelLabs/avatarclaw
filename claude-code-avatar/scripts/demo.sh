@@ -20,7 +20,7 @@ fi
 
 echo ""
 echo "== realtime passthrough create (uses credits) =="
-python3 "$ROOT/skills/atlas-avatar/scripts/atlas_session.py" start --mode passthrough >"$SESSION"
+python3 "$ROOT/skills/atlas-avatar/scripts/atlas_session.py" start >"$SESSION"
 python3 -c "
 import json
 p = '$SESSION'

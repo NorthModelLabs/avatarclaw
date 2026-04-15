@@ -15,7 +15,7 @@ You are my terminal agent: I describe a goal, you run the exact bash commands in
 
 Goal A — free smoke (no billing): run health + first 25 lines of index.
 Goal B — paid smoke (uses a few cents): run ./claude-code-avatar/scripts/demo.sh (needs ATLAS_API_KEY in the shell).
-Goal C — “make a realtime session” (paid): run atlas_session start --mode conversation --face-url "https://example.com/face.jpg", show JSON with token redacted, remind me to leave with session_id.
+Goal C — “make a realtime session” (paid): run atlas_session start --face-url "https://example.com/face.jpg", show JSON with token redacted, remind me to leave with session_id.
 
 Start with Goal A, then ask which letter I want next.
 ```
@@ -35,13 +35,13 @@ python3 skills/atlas-avatar/scripts/atlas_session.py index | head -30
 
 ---
 
-## Realtime conversation (needs key + HTTPS face)
+## Realtime passthrough (needs key + HTTPS face)
 
-> Start a **conversation** realtime session with this face URL, print JSON, then tell me the `session_id` and remind me to run `leave` when finished.
+> Start a **passthrough** realtime session with this face URL, print JSON, then tell me the `session_id` and remind me to run `leave` when finished.
 
 ```bash
 export ATLAS_API_KEY="…"
-python3 skills/atlas-avatar/scripts/atlas_session.py start --mode conversation --face-url "https://example.com/face.jpg"
+python3 skills/atlas-avatar/scripts/atlas_session.py start --face-url "https://example.com/face.jpg"
 ```
 
 Then leave:

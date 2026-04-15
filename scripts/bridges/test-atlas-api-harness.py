@@ -32,7 +32,6 @@ import argparse
 import json
 import os
 import sys
-import time
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -75,12 +74,6 @@ def main() -> None:
         "--no-realtime",
         action="store_true",
         help="Skip realtime create/get/viewer/delete (no billing for that flow).",
-    )
-    p.add_argument(
-        "--realtime-mode",
-        choices=("passthrough", "conversation"),
-        default="passthrough",
-        help="Mode for POST /v1/realtime/session (default passthrough, no face).",
     )
     p.add_argument(
         "--face",
@@ -139,13 +132,7 @@ def main() -> None:
     else:
         face = args.face.strip() or None
         face_url = args.face_url.strip() or None
-        if args.realtime_mode == "conversation" and not face and not face_url:
-            print(
-                "FAIL: conversation mode usually needs --face or --face-url; refusing.",
-                file=sys.stderr,
-            )
-            sys.exit(2)
-        r = api.api_realtime_create(args.realtime_mode, face, face_url)
+        r = api.api_realtime_create("passthrough", face, face_url)
         _require("POST /v1/realtime/session", r)
         try:
             sess = r.json()

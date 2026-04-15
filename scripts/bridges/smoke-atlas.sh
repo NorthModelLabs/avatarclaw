@@ -24,7 +24,7 @@ python3 "$ROOT/core/atlas_cli.py" me
 echo "== POST /v1/realtime/session (passthrough, no face — may 4xx if invalid) =="
 TMP="$(mktemp)"
 set +e
-python3 "$ROOT/core/atlas_cli.py" realtime create --mode passthrough >"$TMP" 2>&1
+python3 "$ROOT/core/atlas_cli.py" realtime create >"$TMP" 2>&1
 EC=$?
 set -e
 cat "$TMP"

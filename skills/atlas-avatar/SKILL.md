@@ -1,7 +1,7 @@
 ---
 name: atlas_avatar
-description: "Create realtime AI avatar sessions (LiveKit WebRTC), view-only viewer tokens for multi-viewer watch, and offline lip-sync avatar videos using the Atlas API by North Model Labs. Post offline MP4 renders to Discord (webhook). Use when the user asks for Atlas avatar, talking head, realtime avatar, face animation, video from audio+image, lip sync, BYOB TTS + /v1/generate, watch-only audience, Discord delivery of renders, or GPU avatar rendering."
-version: "1.0.4"
+description: "Create realtime **passthrough** AI avatar sessions (LiveKit WebRTC — you bring STT/LLM/TTS and publish audio), view-only viewer tokens for multi-viewer watch, and offline lip-sync avatar videos using the Atlas API by North Model Labs. Post offline MP4 renders to Discord (webhook). Use when the user asks for Atlas avatar, talking head, realtime avatar, face animation, video from audio+image, lip sync, BYOB TTS + /v1/generate, watch-only audience, Discord delivery of renders, or GPU avatar rendering."
+version: "1.0.5"
 tags: ["avatar", "video", "realtime", "livekit", "lip-sync", "atlas", "gpu", "openclaw"]
 author: "northmodellabs"
 metadata:
@@ -15,7 +15,7 @@ metadata:
 
 Server version: check `GET /` → `version` (docs may lag production).
 
-Atlas provides **realtime** sessions (LiveKit) and **async** offline jobs (`POST /v1/generate` → poll → result). API keys: [North Model Labs dashboard](https://dashboard.northmodellabs.com/dashboard/keys).
+Atlas provides **realtime passthrough** sessions (LiveKit — you supply the audio/intelligence pipeline; Atlas GPU lip-sync) and **async** offline jobs (`POST /v1/generate` → poll → result). API keys: [North Model Labs dashboard](https://dashboard.northmodellabs.com/dashboard/keys).
 
 **Full API surface** (error codes, webhook signature verification, limits): [northmodellabs.com/api](https://www.northmodellabs.com/api). **Live examples** in the browser: [northmodellabs.com/examples](https://www.northmodellabs.com/examples).
 
@@ -41,8 +41,8 @@ From the **monorepo root**:
 
 ```bash
 python3 skills/atlas-avatar/scripts/atlas_session.py health
-python3 skills/atlas-avatar/scripts/atlas_session.py start --mode conversation --face-url "https://example.com/face.jpg"
-python3 skills/atlas-avatar/scripts/atlas_session.py start --mode passthrough --face /path/to/face.jpg
+python3 skills/atlas-avatar/scripts/atlas_session.py start --face-url "https://example.com/face.jpg"
+python3 skills/atlas-avatar/scripts/atlas_session.py start --face /path/to/face.jpg
 python3 skills/atlas-avatar/scripts/atlas_session.py status --session-id SESSION_ID
 python3 skills/atlas-avatar/scripts/atlas_session.py face-swap --session-id SESSION_ID --face /path/to/new.jpg
 python3 skills/atlas-avatar/scripts/atlas_session.py leave --session-id SESSION_ID
@@ -89,8 +89,8 @@ From the **repository root** (full clone with `core/` + `skills/`):
 ```bash
 python3 core/atlas_cli.py health
 python3 core/atlas_cli.py me
-python3 core/atlas_cli.py realtime create --mode conversation --face-url "https://example.com/face.jpg"
-python3 core/atlas_cli.py realtime create --mode passthrough --face /path/to/face.jpg
+python3 core/atlas_cli.py realtime create --face-url "https://example.com/face.jpg"
+python3 core/atlas_cli.py realtime create --face /path/to/face.jpg
 python3 core/atlas_cli.py realtime get SESSION_ID
 python3 core/atlas_cli.py realtime patch SESSION_ID --face /path/to/new_face.jpg
 python3 core/atlas_cli.py realtime delete SESSION_ID
@@ -169,16 +169,16 @@ curl -sS "${ATLAS_API_BASE:-https://api.atlasv1.com}/v1/jobs/JOB_ID/result" \
 
 **409 `not_ready`** if still processing.
 
-### Realtime — create (JSON)
+### Realtime — create (JSON, passthrough)
 
 ```bash
 curl -sS -X POST "${ATLAS_API_BASE:-https://api.atlasv1.com}/v1/realtime/session" \
   -H "Authorization: Bearer ${ATLAS_API_KEY}" \
   -H "Content-Type: application/json" \
-  -d '{"mode":"conversation","face_url":"https://example.com/face.jpg"}'
+  -d '{"mode":"passthrough","face_url":"https://example.com/face.jpg"}'
 ```
 
-### Realtime — create (multipart)
+### Realtime — create (multipart, passthrough)
 
 ```bash
 curl -sS -X POST "${ATLAS_API_BASE:-https://api.atlasv1.com}/v1/realtime/session" \
@@ -187,7 +187,7 @@ curl -sS -X POST "${ATLAS_API_BASE:-https://api.atlasv1.com}/v1/realtime/session
   -F "face=@/path/to/face.jpg"
 ```
 
-**200:** `session_id`, `livekit_url`, `token`, `room`, `pricing` (exact string from API — tiers vary by `mode`; see dashboard).
+**200:** `session_id`, `livekit_url`, `token`, `room`, `pricing` (exact string from API; see dashboard).
 
 ### Session lifecycle
 
@@ -230,9 +230,9 @@ curl -sS -X POST "${ATLAS_API_BASE:-https://api.atlasv1.com}/v1/realtime/session
 
 JSON uses **`error`** + **`message`**. Full table: [API docs → Error Responses](https://www.northmodellabs.com/api#errors). Webhook verification: [Webhooks](https://www.northmodellabs.com/api#webhooks).
 
-## Passthrough mode — persistent audio track
+## Realtime passthrough — persistent audio track
 
-When using **passthrough** mode with a browser client, use the **persistent audio track pattern**. **Do not** call `publishAudio()` directly — it tears down the track after each call, causing the avatar to freeze between messages.
+This skill documents **passthrough** only. With a browser client, use the **persistent audio track pattern**. **Do not** call `publishAudio()` directly — it tears down the track after each call, causing the avatar to freeze between messages.
 
 ```typescript
 import { LocalAudioTrack, Track } from "livekit-client";
@@ -270,9 +270,9 @@ function playTtsAudio(base64Audio: string) {
 
 Full React/Next.js example (host + **`/watch/[id]`** viewer flow): [atlas-realtime-example](https://github.com/NorthModelLabs/atlas-realtime-example) | [API docs](https://www.northmodellabs.com/api) | [Examples](https://www.northmodellabs.com/examples)
 
-## OpenClaw as LLM
+## OpenClaw + Atlas
 
-Point your chat client at OpenClaw’s HTTP gateway (same shape many agent stacks use for chat completions); use this skill for Atlas. **Conversation** mode uses Atlas STT/LLM/TTS unless you use **passthrough** and your own audio.
+Use OpenClaw (or any agent) for **text/tools**; use this skill to call **Atlas passthrough** realtime and offline APIs. **Video and mic** live in your **WebRTC viewer** (or bridges), not inside the chat UI — you bring **STT / LLM / TTS** (e.g. ElevenLabs + your model) and publish audio into the LiveKit room per the pattern above.
 
 ## Related bridges
 

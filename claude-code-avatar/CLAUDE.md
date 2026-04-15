@@ -8,8 +8,8 @@ Use this file when the agent should drive **North Model Labs Atlas** from this m
 
   ```bash
   python3 skills/atlas-avatar/scripts/atlas_session.py health
-  python3 skills/atlas-avatar/scripts/atlas_session.py start --mode conversation --face-url "https://…"
-  python3 core/atlas_cli.py realtime create --mode passthrough
+  python3 skills/atlas-avatar/scripts/atlas_session.py start --face-url "https://…"
+  python3 core/atlas_cli.py realtime create
   ```
 
 - If your **cwd is `claude-code-avatar/`**, prefix with `../`:

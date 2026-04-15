@@ -30,7 +30,7 @@ cat >"$TMP" <<'EOF'
 {
   "session_id": "atlas-bridge-smoke",
   "room": "smoke-room",
-  "mode": "conversation",
+  "mode": "passthrough",
   "bridge_note": "Smoke test — not a live Atlas session.",
   "viewer_url": "https://example.com/avatar-viewer-smoke"
 }
